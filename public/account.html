@@ -1,0 +1,67 @@
+cat > public/account.html << 'EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account - BankSmart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav>
+  <a href="/" class="logo">Bank<span style="color:#4361ee">Smart</span></a>
+  <a href="/dashboard.html">Dashboard</a>
+  <a href="/transfer.html">Transfer</a>
+  <a href="/account.html">Account</a>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</nav>
+<div class="transfer-page">
+  <h1>Account Settings</h1>
+  <p>Manage your BankSmart account</p>
+  <div class="section-card">
+    <div class="section-header"><h2>Personal Information</h2></div>
+    <div class="form-group">
+      <label>Full name</label>
+      <input type="text" id="accName" readonly style="background:#f9f9f9"/>
+    </div>
+    <div class="form-group">
+      <label>Email address</label>
+      <input type="email" id="accEmail" readonly style="background:#f9f9f9"/>
+    </div>
+    <div class="form-group">
+      <label>Phone number</label>
+      <input type="text" id="accPhone" readonly style="background:#f9f9f9"/>
+    </div>
+    <div class="form-group">
+      <label>Account number</label>
+      <input type="text" id="accNumber" readonly style="background:#f9f9f9"/>
+    </div>
+  </div>
+  <div class="section-card" style="margin-top:20px">
+    <div class="section-header"><h2>Security</h2></div>
+    <div style="font-size:13px;color:#555;line-height:2">
+      <div>Two-factor authentication: Enabled</div>
+      <div>Last login: Today at 9:00 AM</div>
+      <div>Account status: Active and verified</div>
+    </div>
+  </div>
+</div>
+<footer>BankSmart - Secure Banking Platform - QA Testing Demo</footer>
+<script>
+  const userId = localStorage.getItem('userId') || 1;
+  async function loadAccount() {
+    const res = await fetch('/api/account/' + userId);
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('accName').value = data.user.name;
+      document.getElementById('accEmail').value = data.user.email;
+      document.getElementById('accPhone').value = data.user.phone;
+      document.getElementById('accNumber').value = data.user.accountNumber;
+    }
+  }
+  function logout() { localStorage.clear(); window.location.href = '/'; }
+  loadAccount();
+</script>
+</body>
+</html>
+EOF

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — BankSmart</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">Bank<span style="color:#4361ee">Smart</span></a>
+  <a href="/dashboard.html">Dashboard</a>
+  <a href="/transfer.html">Transfer</a>
+  <a href="/account.html">Account</a>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</nav>
+
+<div class="dashboard">
+  <div class="dashboard-header">
+    <div>
+      <h1 id="welcomeMsg">Welcome back!</h1>
+      <p>Here is your financial summary for today</p>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="balance-card">
+      <div class="label">Current Balance</div>
+      <div class="amount" id="balance">$0.00</div>
+      <div class="account-num" id="accountNum">Loading...</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Savings Account</div>
+      <div class="stat-value" id="savings">$0.00</div>
+      <div class="stat-sub">Earning 3.5% APY</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Credit Score</div>
+      <div class="stat-value" id="creditScore">---</div>
+      <div class="stat-sub">Excellent rating</div>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <a href="/transfer.html" class="action-btn">
+      <div class="action-icon">→</div>
+      <div class="action-label">Transfer</div>
+    </a>
+    <a href="#" class="action-btn">
+      <div class="action-icon">↓</div>
+      <div class="action-label">Deposit</div>
+    </a>
+    <a href="#" class="action-btn">
+      <div class="action-icon">$</div>
+      <div class="action-label">Pay Bills</div>
+    </a>
+    <a href="/account.html" class="action-btn">
+      <div class="action-icon">⚙</div>
+      <div class="action-label">Settings</div>
+    </a>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header">
+      <h2>Recent Transactions</h2>
+      <a href="#">View all</a>
+    </div>
+    <div id="transactionsList"></div>
+  </div>
+</div>
+
+<footer>BankSmart — Secure Banking Platform — QA Testing Demo</footer>
+
+<script>
+  const userId = localStorage.getItem('userId') || 1;
+  const userName = localStorage.getItem('userName') || 'User';
+
+  document.getElementById('welcomeMsg').textContent = `Welcome back, ${userName.split(' ')[0]}!`;
+
+  async function loadDashboard() {
+    const res = await fetch(`/api/dashboard/${userId}`);
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('balance').textContent = `$${data.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      document.getElementById('savings').textContent = `$${data.savingsBalance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      document.getElementById('creditScore').textContent = data.creditScore;
+      document.getElementById('accountNum').textContent = data.accountNumber;
+      renderTransactions(data.recentTransactions);
+    }
+  }
+
+  function renderTransactions(transactions) {
+    const icons = { Income: '↑', Entertainment: '▶', Housing: '⌂', Shopping: '◈', Transfer: '→', Utilities: '⚡', Investment: '◆' };
+    document.getElementById('transactionsList').innerHTML = transactions.map(t => `
+      <div class="transaction-item">
+        <div class="trans-icon ${t.type}">${icons[t.category] || '•'}</div>
+        <div class="trans-info">
+          <div class="trans-name">${t.description}</div>
+          <div class="trans-date">${t.date} · <span class="trans-category">${t.category}</span></div>
+        </div>
+        <div class="trans-amount ${t.type}">${t.type === 'credit' ? '+' : '-'}$${t.amount.toFixed(2)}</div>
+      </div>
+    `).join('');
+  }
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = '/';
+  }
+
+  loadDashboard();
+</script>
+</body>
+</html>
