@@ -117,6 +117,23 @@ app.get('/api/account/:userId', (req, res) => {
   });
 });
 
+
+app.get('/api/products', (req, res) => {
+  res.json({ success: true, products: ['Savings Account', 'Credit Card', 'Home Loan', 'Personal Loan'] });
+});
+
+app.post('/api/contact', (req, res) => {
+  const { name, email, message } = req.body;
+    return res.status(400).json({ success: false, message: 'All fields are required' });
+  }
+    return res.status(400).json({ success: false, message: 'Invalid email format' });
+  }
+  if (message.length < 10) {
+    return res.status(400).json({ success: false, message: 'Message too short' });
+  }
+  res.json({ success: true, message: 'Message sent successfully' });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ success: true, status: 'BankSmart API is running', version: '1.0.0' });
 });
